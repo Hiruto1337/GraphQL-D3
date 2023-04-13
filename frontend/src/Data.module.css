@@ -1,0 +1,37 @@
+.component {
+    font-family: Arial;
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+    border-radius: 4px;
+    user-select: none;
+}
+
+.component:hover {
+    background-color: #00000010;
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #00000010;
+}
+
+.display {
+    display: flex;
+    align-items: center;
+}
+
+.icon {
+    font-size: 24px;
+    margin-right: 8px;
+}
+
+.row {
+    color: #ffffffa0;
+}
+
+.divider {
+    width: 100%;
+    border: 1px solid #ffffffa0;
+    border-radius: 4px;
+}

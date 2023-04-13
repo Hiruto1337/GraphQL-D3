@@ -1,0 +1,56 @@
+.component {
+    display: flex;
+    height: 821px;
+    overflow: hidden;
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    background-color: #5045e4;
+    padding: 16px;
+    width: 512px;
+    max-height: 100%;
+    overflow-y: scroll;
+}
+
+.sidebar > div {
+    margin-bottom: 8px;
+}
+
+.switch {
+    display: flex;
+    justify-content: center;
+}
+
+.switchButton {
+    background-color: transparent;
+    border: none;
+    font-size: 32px;
+    border-radius: 4px;
+    padding: 8px 32px;
+}
+
+.switchButton:hover {
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #00000020;
+    transition: 0.25s;
+}
+
+.button {
+    margin-top: 16px;
+    border: none;
+    background-color: #ffffffa0;
+    color: #5045e4;
+    padding: 12px;
+    font-size: 20px;
+    border-radius: 4px;
+}
+
+.button:hover {
+    background-color: white;
+    cursor: pointer;
+}

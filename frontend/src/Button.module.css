@@ -1,0 +1,29 @@
+.component {
+    border-radius: 4px;
+}
+
+.button {
+    width: 100%;
+    border: none;
+    text-align: left;
+    padding: 12px;
+    border-radius: 4px;
+    font-family: Arial;
+    background-color: transparent;
+    color: #ffffffa0;
+    font-size: 16px;
+    padding-left: 20px;
+}
+
+.button:hover {
+    background-color: #00000020;
+    cursor: pointer;
+}
+
+.selected {
+    color: white;
+}
+
+.list {
+    padding: 8px;
+}
