@@ -38,83 +38,48 @@ import express from "express";
 import { graphql, buildSchema } from "graphql";
 import people_data from "./database/people.json" assert { type: "json" };
 import movie_data from "./database/movies.json" assert { type: "json" };
+import { Person, Movie } from "./Classes.js";
 import "graphql";
 import cors from "cors";
 // GraphQL
-var schema = buildSchema("\n    type Query {\n        people(name: String): [Person!]!\n        movies(title: String): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies: [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people: [Person!]!\n    }\n");
+var schema = buildSchema("\n    type Query {\n        people(name: String): [Person!]!\n        movies(title: String): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies(title: String): [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people(name: String): [Person!]!\n    }\n");
 var rootValue = {
-    people: function (args, parent) {
+    people: function (_a) {
+        var name = _a.name;
         var list = [];
         var people = people_data;
-        if (args === null || args === void 0 ? void 0 : args.name) {
+        if (name) {
             for (var id in people) {
-                if (people[id].name == args.name) {
-                    list.push(people[id]);
+                if (people[id].name == name) {
+                    list.push(new Person(people[id]));
                 }
             }
         }
         else {
             for (var id in people) {
-                list.push(people[id]);
+                list.push(new Person(people[id]));
             }
         }
         return list;
     },
-    movies: function (args, parent) {
+    movies: function (_a) {
+        var title = _a.title;
         var list = [];
         var movies = movie_data;
-        if (args.title) {
+        if (title) {
             for (var id in movies) {
-                if (movies[id].title == args.title) {
-                    list.push(movies[id]);
+                if (movies[id].title == title) {
+                    list.push(new Movie(movies[id]));
                 }
             }
         }
         else {
             for (var id in movies) {
-                list.push(movies[id]);
+                list.push(new Movie(movies[id]));
             }
         }
         return list;
     },
-    Person: {
-        id: function (parent) {
-            return parent.id;
-        },
-        name: function (parent) {
-            return parent.name;
-        },
-        born: function (parent) {
-            return parent.born;
-        },
-        movies: function (parent, args) {
-            var list = [];
-            var movies = movie_data;
-            for (var id in parent.movies) {
-                list.push(movies[id]);
-            }
-            return list;
-        }
-    },
-    Movie: {
-        id: function (parent) {
-            return parent.id;
-        },
-        title: function (parent) {
-            return parent.title;
-        },
-        released: function (parent) {
-            return parent.released;
-        },
-        people: function (parent, args) {
-            var list = [];
-            var people = people_data;
-            for (var id in parent.people) {
-                list.push(people[id]);
-            }
-            return list;
-        }
-    }
 };
 // Express
 var app = express();
@@ -124,9 +89,7 @@ app.post("/graphQL", function (req, res) { return __awaiter(void 0, void 0, void
     var result;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                console.log(req.body.query);
-                return [4 /*yield*/, graphql({ schema: schema, source: req.body.query, rootValue: rootValue })];
+            case 0: return [4 /*yield*/, graphql({ schema: schema, source: req.body.query, rootValue: rootValue })];
             case 1:
                 result = _a.sent();
                 res.send(result);

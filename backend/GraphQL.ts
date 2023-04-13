@@ -2,6 +2,7 @@ import express from "express";
 import { graphql, buildSchema } from "graphql";
 import people_data from "./database/people.json" assert {type: "json"};
 import movie_data from "./database/movies.json" assert {type: "json"};
+import { Person, Movie, PersonData, MovieData } from "./Classes.js";
 import "graphql";
 import cors from "cors";
 
@@ -16,110 +17,54 @@ const schema = buildSchema(`
         id: ID!
         name: String!
         born: Int
-        movies: [Movie!]!
+        movies(title: String): [Movie!]!
     }
 
     type Movie {
         id: ID!
         title: String!
         released: Int
-        people: [Person!]!
+        people(name: String): [Person!]!
     }
 `);
 
-interface Person {
-    id: string;
-    name: string;
-    born?: number;
-    movies: string[] | Movie[];
-}
-
-interface Movie {
-    id: string;
-    title: string;
-    released?: number;
-    people: string[] | Person[];
-}
-
 const rootValue = {
-    people(args: { name?: string }, parent?: Movie) {
+    people({ name }: {name?: string}): Person[] {
         let list: Person[] = [];
-        const people: { [key: string]: Person } = people_data;
+        const people: { [key: string]: PersonData } = people_data;
 
-        if (args?.name) {
+        if (name) {
             for (const id in people) {
-                if (people[id].name == args.name) {
-                    list.push(people[id]);
+                if (people[id].name == name) {
+                    list.push(new Person(people[id]));
                 }
             }
         } else {
             for (const id in people) {
-                list.push(people[id]);
+                list.push(new Person(people[id]));
             }
         }
 
         return list;
     },
-    movies(args: { title?: string }, parent?: Person) {
+    movies({ title }: {title?: string}): Movie[] {
         let list: Movie[] = [];
-        const movies: { [key: string]: Movie } = movie_data;
+        const movies: { [key: string]: MovieData } = movie_data;
 
-        if (args.title) {
+        if (title) {
             for (const id in movies) {
-                if (movies[id].title == args.title) {
-                    list.push(movies[id]);
+                if (movies[id].title == title) {
+                    list.push(new Movie(movies[id]));
                 }
             }
         } else {
             for (const id in movies) {
-                list.push(movies[id]);
+                list.push(new Movie(movies[id]));
             }
         }
 
         return list;
     },
-    Person: {
-        id(parent: Person) {
-            return parent.id;
-        },
-        name(parent: Person) {
-            return parent.name;
-        },
-        born(parent: Person) {
-            return parent.born;
-        },
-        movies(parent: Person, args: { title?: string }) {
-            let list: Movie[] = [];
-            const movies: { [key: string]: Movie } = movie_data;
-
-            for (const id in parent.movies) {
-                list.push(movies[id]);
-            }
-
-            return list;
-        }
-    },
-    Movie: {
-        id(parent: Movie) {
-            return parent.id;
-        },
-        title(parent: Movie) {
-            return parent.title;
-        },
-        released(parent: Movie) {
-            return parent.released;
-        },
-        people(parent: Movie, args: { name?: string }) {
-            let list: Person[] = [];
-            const people: { [key: string]: Person } = people_data;
-
-            for (const id in parent.people) {
-                list.push(people[id]);
-            }
-
-            return list;
-        }
-    }
 };
 
 // Express
@@ -129,7 +74,6 @@ app.use(express.json());
 app.use(cors());
 
 app.post("/graphQL", async (req, res) => {
-    console.log(req.body.query);
     let result = await graphql({ schema, source: req.body.query, rootValue });
     res.send(result);
 });
