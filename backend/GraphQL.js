@@ -42,10 +42,10 @@ import { Person, Movie } from "./Classes.js";
 import "graphql";
 import cors from "cors";
 // GraphQL
-var schema = buildSchema("\n    type Query {\n        people(name: String): [Person!]!\n        movies(title: String): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies(title: String): [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people(name: String): [Person!]!\n    }\n");
+var schema = buildSchema("\n    type Query {\n        people(name: String, born: Int, movies: [String!]): [Person!]!\n        movies(title: String, released: Int, people: [String!]): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies(title: String): [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people(name: String): [Person!]!\n    }\n");
 var rootValue = {
     people: function (_a) {
-        var name = _a.name;
+        var name = _a.name, born = _a.born, movies = _a.movies;
         var list = [];
         var people = people_data;
         if (name) {
@@ -63,7 +63,7 @@ var rootValue = {
         return list;
     },
     movies: function (_a) {
-        var title = _a.title;
+        var title = _a.title, released = _a.released, people = _a.people;
         var list = [];
         var movies = movie_data;
         if (title) {

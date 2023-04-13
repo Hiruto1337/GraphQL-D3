@@ -1,20 +1,6 @@
 import people_data from "./database/people.json" assert {type: "json"};
 import movie_data from "./database/movies.json" assert {type: "json"};
 
-export interface PersonData{
-    id: string;
-    name: string;
-    born?: number;
-    movieIds: string[];
-}
-
-export interface MovieData {
-    id: string;
-    title: string;
-    released: number;
-    peopleIds: string[];
-}
-
 export class Person {
     id: string;
     name: string;
@@ -28,10 +14,10 @@ export class Person {
         this.movieIds = jsonData.movieIds;
     }
 
-    movies({title}: {title?: string}): Movie[] {
+    movies?({title}: {title?: string}): Movie[] {
         let list: Movie[] = [];
 
-        const movies: { [key: string]: MovieData } = movie_data;
+        const movies: { [key: string]: Movie } = movie_data;
 
         if (title) {
             for (const movieId of this.movieIds) {
@@ -62,10 +48,10 @@ export class Movie {
         this.peopleIds = jsonData.peopleIds;
     }
 
-    people({name}: {name?: string}): Person[] {
+    people?({name}: {name?: string}): Person[] {
         let list: Person[] = [];
 
-        const people: { [key: string]: PersonData } = people_data;
+        const people: { [key: string]: Person } = people_data;
 
         if (name) {
             for (const personId of this.peopleIds) {

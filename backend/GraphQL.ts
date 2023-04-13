@@ -2,15 +2,15 @@ import express from "express";
 import { graphql, buildSchema } from "graphql";
 import people_data from "./database/people.json" assert {type: "json"};
 import movie_data from "./database/movies.json" assert {type: "json"};
-import { Person, Movie, PersonData, MovieData } from "./Classes.js";
+import { Person, Movie } from "./Classes.js";
 import "graphql";
 import cors from "cors";
 
 // GraphQL
 const schema = buildSchema(`
     type Query {
-        people(name: String): [Person!]!
-        movies(title: String): [Movie!]!
+        people(name: String, born: Int, movies: [String!]): [Person!]!
+        movies(title: String, released: Int, people: [String!]): [Movie!]!
     }
 
     type Person {
@@ -29,9 +29,9 @@ const schema = buildSchema(`
 `);
 
 const rootValue = {
-    people({ name }: {name?: string}): Person[] {
+    people({ name, born, movies }: {name?: string, born?: number, movies?: Movie[]}): Person[] {
         let list: Person[] = [];
-        const people: { [key: string]: PersonData } = people_data;
+        const people: { [key: string]: Person } = people_data;
 
         if (name) {
             for (const id in people) {
@@ -47,9 +47,9 @@ const rootValue = {
 
         return list;
     },
-    movies({ title }: {title?: string}): Movie[] {
+    movies({ title, released, people }: {title?: string, released?: number, people?: string[]}): Movie[] {
         let list: Movie[] = [];
-        const movies: { [key: string]: MovieData } = movie_data;
+        const movies: { [key: string]: Movie } = movie_data;
 
         if (title) {
             for (const id in movies) {

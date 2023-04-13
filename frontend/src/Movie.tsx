@@ -39,7 +39,6 @@ export default function Movie({ setQuery, depth }: { setQuery: React.Dispatch<Re
                     <hr style={{ border: "1px solid #ffffffa0", borderRadius: 4, width: "95%" }} />
                     <SubButton text="Title" qVal="title" setState={setTitle} setFilter={setTitleFilter} />
                     <SubButton text="Year" qVal="year" setState={setYear} setFilter={setYearFilter} />
-                    <SubButton text="Revenue" qVal="revenue" setState={setRevenue} setFilter={setRevenueFilter} />
                     <Person setQuery={setPersonQuery} depth={depth + 1} />
                 </div>
                 :

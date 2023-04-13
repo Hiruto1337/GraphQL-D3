@@ -18,8 +18,6 @@ export interface Movie {
     id: string;
     title?: string;
     year?: Number;
-    imdbRating?: Number;
-    revenue?: Number;
     people?: Person[];
 }
 
@@ -130,4 +128,4 @@ export default function App() {
 // - Shortest path between nodes
 // - Filtering
 // - Data display on hovering
-// - Double-click on node neighbors and displays them
+// - Double-click on node and display neighbors
