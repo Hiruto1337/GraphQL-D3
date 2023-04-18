@@ -4,7 +4,7 @@ import styles from './App.module.css';
 import Graph from './Graph';
 import Movie from './Movie';
 import Person from './Person';
-import { getGraphData } from './functions';
+import { MovieNode, PersonNode, getGraphData } from './functions';
 import DataPerson from './DataPerson';
 import DataMovie from './DataMovie';
 
@@ -21,11 +21,6 @@ export interface Movie {
     people?: Person[];
 }
 
-export interface Node {
-    id: string;
-    icon: string;
-}
-
 export interface Link {
     source: string;
     target: string;
@@ -37,12 +32,12 @@ interface Data {
 }
 
 export default function App() {
-    async function getQuery() {
+    async function getQuery(queryString: string) {
         try {
             const response = await axios("http://localhost:4000/graphQL", {
                 method: "POST",
                 data: {
-                    query
+                    query: queryString
                 }
             });
             const data: Data = response.data.data;
@@ -50,11 +45,12 @@ export default function App() {
             setPeople(data.people);
             setMovies(data.movies);
 
-            let newNodes: Node[] = [];
+            let newNodes: (PersonNode | MovieNode)[] = [];
             let newLinks: Link[] = [];
             let nodeSet = new Set<string>();
+            let linkSet = new Set<string>();
 
-            getGraphData(data, newNodes, newLinks, nodeSet);
+            getGraphData(data, newNodes, newLinks, nodeSet, linkSet);
 
             setNodes(newNodes);
             setLinks(newLinks);
@@ -63,7 +59,7 @@ export default function App() {
         }
     }
 
-    const [nodes, setNodes] = useState<Node[]>([
+    const [nodes, setNodes] = useState<(PersonNode | MovieNode)[]>([
         { id: "1", icon: "👨🏻" },
         { id: "2", icon: "🏠" },
         { id: "3", icon: "🚨" },
@@ -77,6 +73,8 @@ export default function App() {
         { source: "4", target: "1" },
         { source: "4", target: "2" },
     ]);
+
+    const [selected, setSelected] = useState<(undefined | string[])[]>([undefined, undefined]);
 
     const [personQuery, setPersonQuery] = useState("");
     const [movieQuery, setMovieQuery] = useState("");
@@ -113,19 +111,38 @@ export default function App() {
                     </>
                     :
                     <>
-                        <Person setQuery={setPersonQuery} depth={0} />
-                        <Movie setQuery={setMovieQuery} depth={0} />
-                        <button className={styles.button} onClick={() => getQuery()}>Search</button>
+                        <Person setQuery={setPersonQuery} />
+                        <Movie setQuery={setMovieQuery} />
+                        <button className={styles.button} onClick={() => getQuery(query)}>Search</button>
                     </>
                 }
+                <div className={styles.shortPath}>
+                    <h3 className={styles.title}>Shortest path</h3>
+                    <div className={styles.pathSelector}>
+                        <div className={styles.path}>
+                            <span className={styles.icon}>{selected[0] ? selected[0][2] : "📍"}</span>
+                            <span className={styles.node}>{selected[0] ? selected[0][1] : "Select node"}</span>
+                        </div>
+                        <span className={`${styles.icon} ${styles.hoverPointer}`} onClick={() => setSelected(prev => [prev[1], prev[0]])}>↔️</span>
+                        <div className={styles.path}>
+                            <span className={styles.icon}>{selected[1] ? selected[1][2] : "📍"}</span>
+                            <span className={styles.node}>{selected[1] ? selected[1][1] : "Select node"}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button className={styles.button} onClick={() => {
+                            if (selected[0] && selected[1]) {
+                                getQuery(`{shortestPath(node1: "${selected[0][0]}", node2: "${selected[1][0]}")}`)
+                            } else console.log("Select two nodes!");
+                        }}>Get path</button>
+                    </div>
+                </div>
             </div>
-            <Graph nodes={nodes} links={links} />
+            <Graph nodes={nodes} links={links} selected={selected} setSelected={setSelected} />
         </div>
     );
 }
 
 // To do:
-// - Shortest path between nodes
-// - Filtering
 // - Data display on hovering
 // - Double-click on node and display neighbors

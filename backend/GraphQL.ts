@@ -9,8 +9,8 @@ import cors from "cors";
 // GraphQL
 const schema = buildSchema(`
     type Query {
-        people(name: String, born: Int, movies: [String!]): [Person!]!
-        movies(title: String, released: Int, people: [String!]): [Movie!]!
+        people(name: String, movies: MovieData): [Person!]!
+        movies(title: String, people: PeopleData): [Movie!]!
     }
 
     type Person {
@@ -26,41 +26,78 @@ const schema = buildSchema(`
         released: Int
         people(name: String): [Person!]!
     }
+
+    input MovieData {
+        title: String
+        released: Int
+        people: PeopleData
+    }
+
+    input PeopleData {
+        name: String
+        born: Int
+        movies: MovieData
+    }
 `);
 
+const peopleData: { [key: string]: Person } = people_data;
+const moviesData: { [key: string]: Movie } = movie_data;
+
 const rootValue = {
-    people({ name, born, movies }: {name?: string, born?: number, movies?: Movie[]}): Person[] {
+    people({ name, movies }: { name?: string, movies?: Movie }): Person[] {
         let list: Person[] = [];
-        const people: { [key: string]: Person } = people_data;
 
         if (name) {
-            for (const id in people) {
-                if (people[id].name == name) {
-                    list.push(new Person(people[id]));
+            for (const id in peopleData) {
+                if (peopleData[id].name == name) {
+                    list.push(new Person(peopleData[id]));
                 }
             }
         } else {
-            for (const id in people) {
-                list.push(new Person(people[id]));
+            for (const id in peopleData) {
+                list.push(new Person(peopleData[id]));
             }
+        }
+
+        if (movies) {
+            list = list.filter(person => {
+                for (const movieId of person.movieIds) {
+                    if (moviesData[movieId].title == movies?.title) {
+                        return true;
+                    }
+                }
+    
+                return false;
+            });
         }
 
         return list;
     },
-    movies({ title, released, people }: {title?: string, released?: number, people?: string[]}): Movie[] {
+    movies({ title, people }: { title?: string, people?: Person }): Movie[] {
         let list: Movie[] = [];
-        const movies: { [key: string]: Movie } = movie_data;
 
         if (title) {
-            for (const id in movies) {
-                if (movies[id].title == title) {
-                    list.push(new Movie(movies[id]));
+            for (const id in moviesData) {
+                if (moviesData[id].title == title) {
+                    list.push(new Movie(moviesData[id]));
                 }
             }
         } else {
-            for (const id in movies) {
-                list.push(new Movie(movies[id]));
+            for (const id in moviesData) {
+                list.push(new Movie(moviesData[id]));
             }
+        }
+
+        if (people) {
+            list = list.filter(movie => {
+                for (const personId of movie.peopleIds) {
+                    if (peopleData[personId].name == people?.name) {
+                        return true;
+                    }
+                }
+    
+                return false;
+            });
         }
 
         return list;
@@ -75,6 +112,7 @@ app.use(cors());
 
 app.post("/graphQL", async (req, res) => {
     let result = await graphql({ schema, source: req.body.query, rootValue });
+    // let result = await graphql({ schema, source: '{people(movies: {title: "The Matrix"}) {id name movies(title: "The Matrix Reloaded") {title}}}', rootValue });
     res.send(result);
 });
 

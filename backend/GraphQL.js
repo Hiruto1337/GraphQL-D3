@@ -42,41 +42,63 @@ import { Person, Movie } from "./Classes.js";
 import "graphql";
 import cors from "cors";
 // GraphQL
-var schema = buildSchema("\n    type Query {\n        people(name: String, born: Int, movies: [String!]): [Person!]!\n        movies(title: String, released: Int, people: [String!]): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies(title: String): [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people(name: String): [Person!]!\n    }\n");
+var schema = buildSchema("\n    type Query {\n        people(name: String, movies: MovieData): [Person!]!\n        movies(title: String, people: PeopleData): [Movie!]!\n    }\n\n    type Person {\n        id: ID!\n        name: String!\n        born: Int\n        movies(title: String): [Movie!]!\n    }\n\n    type Movie {\n        id: ID!\n        title: String!\n        released: Int\n        people(name: String): [Person!]!\n    }\n\n    input MovieData {\n        title: String\n        released: Int\n        people: PeopleData\n    }\n\n    input PeopleData {\n        name: String\n        born: Int\n        movies: MovieData\n    }\n");
+var peopleData = people_data;
+var moviesData = movie_data;
 var rootValue = {
     people: function (_a) {
-        var name = _a.name, born = _a.born, movies = _a.movies;
+        var name = _a.name, movies = _a.movies;
         var list = [];
-        var people = people_data;
         if (name) {
-            for (var id in people) {
-                if (people[id].name == name) {
-                    list.push(new Person(people[id]));
+            for (var id in peopleData) {
+                if (peopleData[id].name == name) {
+                    list.push(new Person(peopleData[id]));
                 }
             }
         }
         else {
-            for (var id in people) {
-                list.push(new Person(people[id]));
+            for (var id in peopleData) {
+                list.push(new Person(peopleData[id]));
             }
+        }
+        if (movies) {
+            list = list.filter(function (person) {
+                for (var _i = 0, _a = person.movieIds; _i < _a.length; _i++) {
+                    var movieId = _a[_i];
+                    if (moviesData[movieId].title == (movies === null || movies === void 0 ? void 0 : movies.title)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
         return list;
     },
     movies: function (_a) {
-        var title = _a.title, released = _a.released, people = _a.people;
+        var title = _a.title, people = _a.people;
         var list = [];
-        var movies = movie_data;
         if (title) {
-            for (var id in movies) {
-                if (movies[id].title == title) {
-                    list.push(new Movie(movies[id]));
+            for (var id in moviesData) {
+                if (moviesData[id].title == title) {
+                    list.push(new Movie(moviesData[id]));
                 }
             }
         }
         else {
-            for (var id in movies) {
-                list.push(new Movie(movies[id]));
+            for (var id in moviesData) {
+                list.push(new Movie(moviesData[id]));
             }
+        }
+        if (people) {
+            list = list.filter(function (movie) {
+                for (var _i = 0, _a = movie.peopleIds; _i < _a.length; _i++) {
+                    var personId = _a[_i];
+                    if (peopleData[personId].name == (people === null || people === void 0 ? void 0 : people.name)) {
+                        return true;
+                    }
+                }
+                return false;
+            });
         }
         return list;
     },
@@ -92,6 +114,7 @@ app.post("/graphQL", function (req, res) { return __awaiter(void 0, void 0, void
             case 0: return [4 /*yield*/, graphql({ schema: schema, source: req.body.query, rootValue: rootValue })];
             case 1:
                 result = _a.sent();
+                // let result = await graphql({ schema, source: '{people(movies: {title: "The Matrix"}) {id name movies(title: "The Matrix Reloaded") {title}}}', rootValue });
                 res.send(result);
                 return [2 /*return*/];
         }

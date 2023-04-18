@@ -1,13 +1,35 @@
 import * as d3 from "d3";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Graph.module.css";
 
-export default function Graph({ nodes, links }) {
+export default function Graph({ nodes, links, selected, setSelected }) {
     const canvasRef = useRef(null);
     const [offsetX, setOffsetX] = useState(-500);
     const [offsetY, setOffsetY] = useState(-500);
     const [zoom, setZoom] = useState(1000);
     const [drag, setDrag] = useState(false);
+
+    const updateSelected = useCallback((prev, node) => {
+        if (!prev[0] && !prev[1]) {
+            // Scenario 1: Both are empty -> Insert as first
+            return [node, undefined];
+        } else if ((prev[0] && !prev[1]) || (!prev[0] && prev[1])) {
+            // Scenario 2: One is selected, other is empty -> Insert at missing
+            if (prev[0]) {
+                return prev[0][0] == node[0] ? prev : [prev[0], node];
+            } else {
+                return prev[1][0] == node[0] ? prev : [node, prev[1]];
+            }
+        } else {
+            if (prev[0][0] == node[0] || prev[1][0] == node[0]) {
+                // Scenario 3: Two are selected, one of which is the one clicked -> Switch
+                return [prev[1], prev[0]];
+            } else {
+                // Scenario 4: Two are selected, none of which is the one clicked -> Replace second
+                return [prev[0], node];
+            }
+        }
+    });
 
     useEffect(() => {
         const svg = d3.select("svg");
@@ -36,7 +58,14 @@ export default function Graph({ nodes, links }) {
         let node = pair.append("circle")
             .attr("r", 25)
             .style("stroke", "#4a4a4a")
-            .style("fill", "#4a4a4a4a");
+            .style("fill", "#4a4a4a4a")
+            .on("dblclick", d => {
+                let data = d.target.__data__;
+
+                const node = [data.id, data.icon == "👨🏻" ? data.name : data.title, data.icon];
+
+                setSelected(prev => updateSelected(prev, node));
+            });
 
         let text = pair.append("text")
             .attr("pointer-events", "none")
