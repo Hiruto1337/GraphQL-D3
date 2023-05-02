@@ -28,6 +28,7 @@ export default function SubButton({ text, qVal, setState, setFilter, type, manda
                         <option value="">Contains</option>
                     </select>
                     <input placeholder="Limit data" className={styles.input} onChange={e => setInput(e.target.value)} value={input} />
+                    {/* Make a "REQUIRE" section that only shows results if a match is found */}
                 </div>
                 :
                 null

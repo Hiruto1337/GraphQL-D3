@@ -29,6 +29,7 @@ export interface Link {
 interface Data {
     people?: Person[];
     movies?: Movie[];
+    shortestPath?: string;
 }
 
 export default function App() {
@@ -40,20 +41,27 @@ export default function App() {
                     query: queryString
                 }
             });
-            const data: Data = response.data.data;
+            
+            let data: Data = response.data.data;
 
-            setPeople(data.people);
-            setMovies(data.movies);
+            if (data.shortestPath) data = JSON.parse(data.shortestPath) as Data;
 
-            let newNodes: (PersonNode | MovieNode)[] = [];
-            let newLinks: Link[] = [];
-            let nodeSet = new Set<string>();
-            let linkSet = new Set<string>();
-
-            getGraphData(data, newNodes, newLinks, nodeSet, linkSet);
-
-            setNodes(newNodes);
-            setLinks(newLinks);
+            if (data) {
+                setPeople(data.people);
+                setMovies(data.movies);
+    
+                let newNodes: (PersonNode | MovieNode)[] = [];
+                let newLinks: Link[] = [];
+                let nodeSet = new Set<string>();
+                let linkSet = new Set<string>();
+    
+                getGraphData(data, newNodes, newLinks, nodeSet, linkSet);
+    
+                setNodes(newNodes);
+                setLinks(newLinks);
+            } else {
+                console.log("Couldn't get data!");
+            }
         } catch (err) {
             console.log(err);
         }
@@ -132,7 +140,7 @@ export default function App() {
                     <div>
                         <button className={styles.button} onClick={() => {
                             if (selected[0] && selected[1]) {
-                                getQuery(`{shortestPath(node1: "${selected[0][0]}", node2: "${selected[1][0]}")}`)
+                                getQuery(`{shortestPath(source: "${selected[0][0]}", target: "${selected[1][0]}")}`)
                             } else console.log("Select two nodes!");
                         }}>Get path</button>
                     </div>

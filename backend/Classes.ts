@@ -6,15 +6,20 @@ export class Person {
     name: string;
     born?: number;
     movieIds: string[];
+    type?: "Person";
 
-    constructor(jsonData: {id: string, name: string, born?: number, movieIds: string[]}) {
+    constructor(id: string) {
+        let jsonData = (people_data as {[key: string]: Person})[id];
+
         this.id = jsonData.id;
         this.name = jsonData.name;
         this.born = jsonData.born;
         this.movieIds = jsonData.movieIds;
+        this.type = "Person";
     }
 
-    movies?({title}: {title?: string}): Movie[] {
+    movies?({title, movie}: {title?: string, movie?: Movie}): Movie[] {
+        if (movie) return [movie];
         let list: Movie[] = [];
 
         const movies: { [key: string]: Movie } = movie_data;
@@ -22,12 +27,12 @@ export class Person {
         if (title) {
             for (const movieId of this.movieIds) {
                 if (movies[movieId].title == title) {
-                    list.push(new Movie(movies[movieId]));
+                    list.push(new Movie(movieId));
                 }
             }
         } else {
             for (const movieId of this.movieIds) {
-                list.push(new Movie(movies[movieId]));
+                list.push(new Movie(movieId));
             }
         }
 
@@ -40,12 +45,16 @@ export class Movie {
     title: string;
     released: number;
     peopleIds: string[];
+    type?: "Movie";
 
-    constructor(jsonData: {id: string, title: string, released: number, peopleIds: string[]}) {
+    constructor(id: string) {
+        let jsonData = (movie_data as {[key: string]: Movie})[id];
+
         this.id = jsonData.id;
         this.title = jsonData.title;
         this.released = jsonData.released;
         this.peopleIds = jsonData.peopleIds;
+        this.type = "Movie";
     }
 
     people?({name}: {name?: string}): Person[] {
@@ -56,12 +65,12 @@ export class Movie {
         if (name) {
             for (const personId of this.peopleIds) {
                 if (people[personId].name == name) {
-                    list.push(new Person(people[personId]));
+                    list.push(new Person(personId));
                 }
             }
         } else {
             for (const personId of this.peopleIds) {
-                list.push(new Person(people[personId]));
+                list.push(new Person(personId));
             }
         }
 
