@@ -5,12 +5,13 @@ import movie_data from "./database/movies.json" assert {type: "json"};
 import { Person, Movie } from "./Classes.js";
 import "graphql";
 import cors from "cors";
+import { numberMatch, stringMatch } from "./functions.js";
 
 // GraphQL
 const schema = buildSchema(`
     type Query {
-        people(name: String, movies: MovieData): [Person!]!
-        movies(title: String, people: PeopleData): [Movie!]!
+        people(name: String, nameVal: Int, born: Int, bornVal: Int): [Person!]!
+        movies(title: String, titleVal: Int, released: Int, releasedVal: Int): [Movie!]!
         shortestPath(source: ID!, target: ID!): String
     }
 
@@ -18,26 +19,14 @@ const schema = buildSchema(`
         id: ID!
         name: String!
         born: Int
-        movies(title: String): [Movie!]!
+        movies(title: String, titleVal: Int, released: Int, releasedVal: Int): [Movie!]!
     }
 
     type Movie {
         id: ID!
         title: String!
         released: Int
-        people(name: String): [Person!]!
-    }
-
-    input MovieData {
-        title: String
-        released: Int
-        people: PeopleData
-    }
-
-    input PeopleData {
-        name: String
-        born: Int
-        movies: MovieData
+        people(name: String, nameVal: Int, born: Int, bornVal: Int): [Person!]!
     }
 `);
 
@@ -54,6 +43,8 @@ const rootValue = {
 
         while (queue.length != 0) {
             let path = queue.shift() as string[];
+
+            if (path.length > 10) return "{}";
 
             let lastId = path[path.length - 1];
 
@@ -77,13 +68,12 @@ const rootValue = {
             }
         }
 
-        // Parse all paths into GraphQL objects
-        let result: {people: {id: string, name: string, movies: (Movie[] | undefined), type: string}[], movies: {id: string, title: string, people: (Person[] | undefined), type: string}[]} = {
+        let result: { people: { id: string, name: string, movies: (Movie[] | undefined), type: string }[], movies: { id: string, title: string, people: (Person[] | undefined), type: string }[] } = {
             people: [],
             movies: []
         };
 
-        function createNode(path: string[]): {id: string, name: string, movies: (Movie[] | undefined), type: string} | {id: string, title: string, people: (Person[] | undefined), type: string} | undefined {
+        function createNode(path: string[]): { id: string, name: string, movies: (Movie[] | undefined), type: string } | { id: string, title: string, people: (Person[] | undefined), type: string } | undefined {
             let id = path.shift();
 
             if (!id) return undefined;
@@ -111,7 +101,7 @@ const rootValue = {
                         people: undefined as Person[] | undefined,
                         type: "Movie"
                     }
-                    
+
                     let person = createNode(path);
 
                     if (person) movieObj.people = [person as Person];
@@ -124,72 +114,22 @@ const rootValue = {
             let node = createNode(path);
 
             switch (node?.type) {
-                case "Person": result.people.push(node as {id: string, name: string, movies: (Movie[] | undefined), type: string}); break;
-                case "Movie": result.movies.push(node as {id: string, title: string, people: (Person[] | undefined), type: string}); break;
+                case "Person": result.people.push(node as { id: string, name: string, movies: (Movie[] | undefined), type: string }); break;
+                case "Movie": result.movies.push(node as { id: string, title: string, people: (Person[] | undefined), type: string }); break;
             }
         }
-
-        console.log(result);
 
         return JSON.stringify(result);
     },
-    people({ name, movies }: { name?: string, movies?: Movie }): Person[] {
-        let list: Person[] = [];
+    people({ name, nameVal, born, bornVal }: { name?: string, nameVal?: number, born?: number, bornVal?: number }): Person[] {
+        let list: Person[] = Object.keys(peopleData).map(id => new Person(id));
 
-        if (name) {
-            for (const id in peopleData) {
-                if (peopleData[id].name == name) {
-                    list.push(new Person(id));
-                }
-            }
-        } else {
-            for (const id in peopleData) {
-                list.push(new Person(id));
-            }
-        }
-
-        if (movies) {
-            list = list.filter(person => {
-                for (const movieId of person.movieIds) {
-                    if (moviesData[movieId].title == movies?.title) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
-        }
-
-        return list;
+        return list.filter(person => (!name ||(name  && stringMatch(person.name, name, nameVal as number))) && ( !born || (born  && numberMatch(person.born, born, bornVal as number))));
     },
-    movies({ title, people }: { title?: string, people?: Person }): Movie[] {
-        let list: Movie[] = [];
+    movies({ title, titleVal, released, releasedVal}: { title?: string, titleVal?: number, released?: number, releasedVal: number}): Movie[] {
+        let list: Movie[] = Object.keys(moviesData).map(id => new Movie(id));
 
-        if (title) {
-            for (const id in moviesData) {
-                if (moviesData[id].title == title) {
-                    list.push(new Movie(id));
-                }
-            }
-        } else {
-            for (const id in moviesData) {
-                list.push(new Movie(id));
-            }
-        }
-
-        if (people) {
-            list = list.filter(movie => {
-                for (const personId of movie.peopleIds) {
-                    if (peopleData[personId].name == people?.name) {
-                        return true;
-                    }
-                }
-
-                return false;
-            });
-        }
-
-        return list;
+        return list.filter(movie => (!title || stringMatch(movie.title, title, titleVal as number)) && (!released || numberMatch(movie.released, released, releasedVal as number)));
     },
 };
 
@@ -202,7 +142,6 @@ app.use(cors());
 app.post("/graphQL", async (req, res) => {
     console.log(req.body.query);
     let result = await graphql({ schema, source: req.body.query, rootValue });
-    // let result = await graphql({ schema, source: '{people(movies: {title: "The Matrix"}) {id name movies(title: "The Matrix Reloaded") {title}}}', rootValue });
     res.send(result);
 });
 

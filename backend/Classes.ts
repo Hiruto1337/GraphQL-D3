@@ -18,8 +18,7 @@ export class Person {
         this.type = "Person";
     }
 
-    movies?({title, movie}: {title?: string, movie?: Movie}): Movie[] {
-        if (movie) return [movie];
+    movies?({title}: {title?: string}): Movie[] {
         let list: Movie[] = [];
 
         const movies: { [key: string]: Movie } = movie_data;

@@ -29,8 +29,8 @@ export default function Movie({ setQuery }: { setQuery: React.Dispatch<React.Set
             {toggled ?
                 <div className={styles.list}>
                     <hr style={{ border: "1px solid #ffffffa0", borderRadius: 4, width: "95%" }} />
-                    <SubButton text="Title" qVal="title" setState={setTitle} setFilter={setReleasedFilter} type="string" mandatory={true} />
-                    <SubButton text="Released" qVal="released" setState={setReleased} setFilter={setYearFilter} type="number" />
+                    <SubButton text="Title" qVal="title" fVal="titleVal" setState={setTitle} setFilter={setReleasedFilter} type="string" mandatory={true} />
+                    <SubButton text="Released" qVal="released" fVal="releasedVal" setState={setReleased} setFilter={setYearFilter} type="number" />
                     <Person setQuery={setPersonQuery} />
                 </div>
                 :

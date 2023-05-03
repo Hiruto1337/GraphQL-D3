@@ -10,9 +10,7 @@ var Person = /** @class */ (function () {
         this.type = "Person";
     }
     Person.prototype.movies = function (_a) {
-        var title = _a.title, movie = _a.movie;
-        if (movie)
-            return [movie];
+        var title = _a.title;
         var list = [];
         var movies = movie_data;
         if (title) {

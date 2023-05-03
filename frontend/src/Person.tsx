@@ -29,8 +29,8 @@ export default function Person({ setQuery }: { setQuery: React.Dispatch<React.Se
             {toggled ?
                 <div className={styles.list}>
                     <hr style={{ border: "1px solid #ffffffa0", borderRadius: 4, width: "95%" }} />
-                    <SubButton text="Name" qVal="name" setState={setName} setFilter={setNameFilter} type="string" mandatory={true} />
-                    <SubButton text="Born" qVal="born" setState={setBorn} setFilter={setBornFilter} type="number" />
+                    <SubButton text="Name" qVal="name" fVal="nameVal" setState={setName} setFilter={setNameFilter} type="string" mandatory={true} />
+                    <SubButton text="Born" qVal="born" fVal="bornVal" setState={setBorn} setFilter={setBornFilter} type="number" />
                     <Movie setQuery={setMovieQuery} />
                 </div>
                 :
