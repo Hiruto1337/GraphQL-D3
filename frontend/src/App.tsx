@@ -41,6 +41,8 @@ export default function App() {
                     query: queryString
                 }
             });
+
+            console.log(response.data);
             
             let data: Data = response.data.data;
 

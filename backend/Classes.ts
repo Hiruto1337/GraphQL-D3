@@ -1,5 +1,6 @@
 import people_data from "./database/people.json" assert {type: "json"};
 import movie_data from "./database/movies.json" assert {type: "json"};
+import { numberMatch, stringMatch } from "./functions.js";
 
 export class Person {
     id: string;
@@ -18,24 +19,10 @@ export class Person {
         this.type = "Person";
     }
 
-    movies?({title}: {title?: string}): Movie[] {
-        let list: Movie[] = [];
+    movies?({title, titleVal, released, releasedVal}: {title?: string, titleVal?: number, released?: number, releasedVal?: number}): Movie[] {
+        let list: Movie[] = this.movieIds.map(id => new Movie(id));
 
-        const movies: { [key: string]: Movie } = movie_data;
-
-        if (title) {
-            for (const movieId of this.movieIds) {
-                if (movies[movieId].title == title) {
-                    list.push(new Movie(movieId));
-                }
-            }
-        } else {
-            for (const movieId of this.movieIds) {
-                list.push(new Movie(movieId));
-            }
-        }
-
-        return list;
+        return list.filter(movie => (!title || stringMatch(movie.title, title, titleVal as number)) && (!released || numberMatch(movie.released, released, releasedVal as number)));
     }
 }
 
@@ -56,23 +43,9 @@ export class Movie {
         this.type = "Movie";
     }
 
-    people?({name}: {name?: string}): Person[] {
-        let list: Person[] = [];
+    people?({name, nameVal, born, bornVal}: {name?: string, nameVal?: number, born?: number, bornVal?: number}): Person[] {
+        let list: Person[] = this.peopleIds.map(id => new Person(id));
 
-        const people: { [key: string]: Person } = people_data;
-
-        if (name) {
-            for (const personId of this.peopleIds) {
-                if (people[personId].name == name) {
-                    list.push(new Person(personId));
-                }
-            }
-        } else {
-            for (const personId of this.peopleIds) {
-                list.push(new Person(personId));
-            }
-        }
-
-        return list;
+        return list.filter(person => (!name || stringMatch(person.name, name, nameVal as number)) && (!born || numberMatch(person.born, born, bornVal as number)));
     }
 }

@@ -124,7 +124,7 @@ const rootValue = {
     people({ name, nameVal, born, bornVal }: { name?: string, nameVal?: number, born?: number, bornVal?: number }): Person[] {
         let list: Person[] = Object.keys(peopleData).map(id => new Person(id));
 
-        return list.filter(person => (!name ||(name  && stringMatch(person.name, name, nameVal as number))) && ( !born || (born  && numberMatch(person.born, born, bornVal as number))));
+        return list.filter(person => (!name || stringMatch(person.name, name, nameVal as number)) && ( !born || numberMatch(person.born, born, bornVal as number)));
     },
     movies({ title, titleVal, released, releasedVal}: { title?: string, titleVal?: number, released?: number, releasedVal: number}): Movie[] {
         let list: Movie[] = Object.keys(moviesData).map(id => new Movie(id));

@@ -139,7 +139,7 @@ var rootValue = {
     people: function (_a) {
         var name = _a.name, nameVal = _a.nameVal, born = _a.born, bornVal = _a.bornVal;
         var list = Object.keys(peopleData).map(function (id) { return new Person(id); });
-        return list.filter(function (person) { return (!name || (name && stringMatch(person.name, name, nameVal))) && (!born || (born && numberMatch(person.born, born, bornVal))); });
+        return list.filter(function (person) { return (!name || stringMatch(person.name, name, nameVal)) && (!born || numberMatch(person.born, born, bornVal)); });
     },
     movies: function (_a) {
         var title = _a.title, titleVal = _a.titleVal, released = _a.released, releasedVal = _a.releasedVal;
