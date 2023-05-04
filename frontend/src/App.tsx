@@ -41,8 +41,6 @@ export default function App() {
                     query: queryString
                 }
             });
-
-            console.log(response.data);
             
             let data: Data = response.data.data;
 
@@ -84,6 +82,7 @@ export default function App() {
         { source: "4", target: "2" },
     ]);
 
+    const [preview, setPreview] = useState<undefined | {icon: string, name?: string, title?: string}>();
     const [selected, setSelected] = useState<(undefined | string[])[]>([undefined, undefined]);
 
     const [personQuery, setPersonQuery] = useState("");
@@ -148,7 +147,7 @@ export default function App() {
                     </div>
                 </div>
             </div>
-            <Graph nodes={nodes} links={links} selected={selected} setSelected={setSelected} />
+            <Graph nodes={nodes} links={links} selected={selected} setSelected={setSelected} setPreview={setPreview} />
         </div>
     );
 }

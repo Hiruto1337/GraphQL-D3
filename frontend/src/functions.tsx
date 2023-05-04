@@ -6,7 +6,7 @@ export interface PersonNode extends Person {
 export interface MovieNode extends Movie {
     icon: string;
 }
-export function getGraphData(data: { people?: Person[], movies?: Movie[] }, nodes: (PersonNode | MovieNode)[], links: Link[], nodeSet: Set<string>, linkSet: Set<string>): (Person | Movie)[] {
+export function getGraphData(data: { people?: Person[], movies?: Movie[] }, nodes: (PersonNode | MovieNode)[], links: Link[], nodeSet: Set<string>, linkSet: Set<string>): (Person | Movie)[] {
     let directChildren: (Person | Movie)[] = [];
     if (data.people) {
         for (let person of data.people) {

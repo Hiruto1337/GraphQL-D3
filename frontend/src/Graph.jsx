@@ -2,7 +2,7 @@ import * as d3 from "d3";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Graph.module.css";
 
-export default function Graph({ nodes, links, selected, setSelected }) {
+export default function Graph({ nodes, links, selected, setSelected, setPreview }) {
     const canvasRef = useRef(null);
     const [offsetX, setOffsetX] = useState(-500);
     const [offsetY, setOffsetY] = useState(-500);

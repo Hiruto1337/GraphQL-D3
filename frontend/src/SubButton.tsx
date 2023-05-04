@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import styles from "./SubButton.module.css";
 
-export default function SubButton({ text, qVal, fVal, setState, setFilter, type, mandatory }: { text: String, qVal: string, fVal: string, setState: React.Dispatch<React.SetStateAction<string>>, setFilter: React.Dispatch<React.SetStateAction<string>>, type: string, mandatory?: boolean }) {
+export default function SubButton({ text, qKey, cmp, setState, setFilter, type, mandatory }: { text: String, qKey: string, cmp: string, setState: React.Dispatch<React.SetStateAction<string>>, setFilter: React.Dispatch<React.SetStateAction<string>>, type: string, mandatory?: boolean }) {
     const [toggled, setToggled] = useState(mandatory ? true : false);
 
     const [selected, setSelected] = useState("0");
@@ -10,8 +10,8 @@ export default function SubButton({ text, qVal, fVal, setState, setFilter, type,
     const [toggleFilter, setToggleFilter] = useState(false);
 
     useEffect(() => {
-        setState(toggled ? qVal : "");
-        setFilter(toggleFilter ? `${qVal}: ${type == "string" ? `"${input}"` : input}, ${fVal}: ${selected}` : "");
+        setState(toggled ? qKey : "");
+        setFilter(toggleFilter ? `${qKey}: ${type == "string" ? `"${input}"` : input}, ${cmp}: ${selected}` : "");
     }, [toggled, input, toggleFilter, selected]);
     return (
         <div className={styles.component}>
