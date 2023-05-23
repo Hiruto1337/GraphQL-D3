@@ -13,6 +13,7 @@ export default function DataPerson({ person }: { person: Person }) {
             {expand ?
                 <>
                     <hr className={styles.divider} />
+                    {person.born ? <span>Born: {person.born}</span> : null}
                     <div className={styles.expand}>
                         {person.movies ? person.movies.map(movie => <DataMovie movie={movie}/>) : null}
                     </div>

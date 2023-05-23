@@ -4,20 +4,23 @@ import styles from './App.module.css';
 import Graph from './Graph';
 import Movie from './Movie';
 import Person from './Person';
-import { MovieNode, PersonNode, getGraphData } from './functions';
+import { getGraphData } from './functions';
 import DataPerson from './DataPerson';
 import DataMovie from './DataMovie';
 
 export interface Person {
+    icon?: string;
     id: string;
     name?: string;
+    born?: number;
     movies?: Movie[];
 }
 
 export interface Movie {
+    icon?: string;
     id: string;
     title?: string;
-    year?: Number;
+    released?: number;
     people?: Person[];
 }
 
@@ -50,7 +53,7 @@ export default function App() {
                 setPeople(data.people);
                 setMovies(data.movies);
     
-                let newNodes: (PersonNode | MovieNode)[] = [];
+                let newNodes: (Person | Movie)[] = [];
                 let newLinks: Link[] = [];
                 let nodeSet = new Set<string>();
                 let linkSet = new Set<string>();
@@ -59,15 +62,13 @@ export default function App() {
     
                 setNodes(newNodes);
                 setLinks(newLinks);
-            } else {
-                console.log("Couldn't get data!");
             }
         } catch (err) {
             console.log(err);
         }
     }
 
-    const [nodes, setNodes] = useState<(PersonNode | MovieNode)[]>([
+    const [nodes, setNodes] = useState<(Person | Movie)[]>([
         { id: "1", icon: "👨🏻" },
         { id: "2", icon: "🏠" },
         { id: "3", icon: "🚨" },
@@ -106,17 +107,8 @@ export default function App() {
                 </div>
                 {showData ?
                     <>
-                        {people ?
-                            people.map(person => <DataPerson person={person} />)
-                            :
-                            null
-                        }
-
-                        {movies ?
-                            movies.map(movie => <DataMovie movie={movie} />)
-                            :
-                            null
-                        }
+                        {people ? people.map(person => <DataPerson person={person} />) : null}
+                        {movies ? movies.map(movie => <DataMovie movie={movie} />) : null}
                     </>
                     :
                     <>

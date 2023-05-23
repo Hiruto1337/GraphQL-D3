@@ -1,12 +1,6 @@
 import { Person, Movie, Link } from "./App";
-export interface PersonNode extends Person {
-    icon: string;
-}
 
-export interface MovieNode extends Movie {
-    icon: string;
-}
-export function getGraphData(data: { people?: Person[], movies?: Movie[] }, nodes: (PersonNode | MovieNode)[], links: Link[], nodeSet: Set<string>, linkSet: Set<string>): (Person | Movie)[] {
+export function getGraphData(data: { people?: Person[], movies?: Movie[] }, nodes: (Person | Movie)[], links: Link[], nodeSet: Set<string>, linkSet: Set<string>): (Person | Movie)[] {
     let directChildren: (Person | Movie)[] = [];
     if (data.people) {
         for (let person of data.people) {

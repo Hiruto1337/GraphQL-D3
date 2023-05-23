@@ -59,12 +59,12 @@ export default function Graph({ nodes, links, selected, setSelected, setPreview 
             .attr("r", 25)
             .style("stroke", "#4a4a4a")
             .style("fill", "#4a4a4a4a")
+            .on("mouseover", d => {
+                setPreview(d.target.__data__);
+            })
             .on("dblclick", d => {
                 let data = d.target.__data__;
-
-                const node = [data.id, data.icon == "👨🏻" ? data.name : data.title, data.icon];
-
-                setSelected(prev => updateSelected(prev, node));
+                setSelected(prev => updateSelected(prev, [data.id, data.icon == "👨🏻" ? data.name : data.title, data.icon]));
             });
 
         let text = pair.append("text")
